@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Invoice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #2c5282 0%, #3182ce 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invoice-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .company-info h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .company-location {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .invoice-title {
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .invoice-details {
+            background: #f8fafc;
+            padding: 25px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .bill-to, .invoice-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .bill-to:hover, .invoice-info:hover {
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            padding: 12px 20px;
+            margin: -20px -20px 15px -20px;
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .invoice-table {
+            margin: 0;
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+        }
+
+        .table-header th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-row {
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .table-row:hover {
+            background: #f7fafc;
+            transform: scale(1.01);
+        }
+
+        .table-row td {
+            padding: 15px;
+            color: #4a5568;
+        }
+
+        .table-row:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .amount-cell {
+            text-align: right;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .add-row-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .add-row-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c53030;
+            transform: scale(1.05);
+        }
+
+        .invoice-totals {
+            background: #f8fafc;
+            padding: 25px;
+        }
+
+        .totals-section {
+            max-width: 400px;
+            margin-left: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .total-row.final {
+            border-bottom: none;
+            border-top: 3px solid #2c5282;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c5282;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #2c5282 0%, #3182ce 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        .editable {
+            background: transparent;
+            border: 2px dashed transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .editable:hover {
+            border-color: #3182ce;
+            background: rgba(49, 130, 206, 0.1);
+        }
+
+        .editable:focus {
+            outline: none;
+            border-color: #3182ce;
+            background: rgba(49, 130, 206, 0.1);
+        }
+
+        .editable-input {
+            background: white;
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: inherit;
+            color: inherit;
+            width: 100%;
+        }
+
+        .editable-input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .invoice-container { box-shadow: none; margin: 0; }
+            .print-btn { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .invoice-title {
+                font-size: 2em;
+            }
+            
+            .company-info h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print Invoice</button>
+    
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="header-content">
+                <div class="company-info">
+                    <h1 class="editable" contenteditable="true">TECHNO SOLUTIONS</h1>
+                    <div class="company-location editable" contenteditable="true">MUMBAI</div>
+                </div>
+                <div class="invoice-title">INVOICE</div>
+            </div>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="invoice-details">
+            <div class="details-grid">
+                <div class="bill-to">
+                    <div class="section-title">BILL TO</div>
+                    <div class="editable" contenteditable="true">RAJESH KUMAR</div>
+                    <div class="editable" contenteditable="true">DELHI</div>
+                </div>
+                
+                <div class="invoice-info">
+                    <div class="section-title">INVOICE INFO</div>
+                    <div class="info-row">
+                        <span class="info-label">Invoice #:</span>
+                        <span class="editable" contenteditable="true">INV-2025-001</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date:</span>
+                        <span class="editable" contenteditable="true">17/07/2025</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Due Date:</span>
+                        <span class="editable" contenteditable="true">31/07/2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Table -->
+        <table class="invoice-table">
+            <thead class="table-header">
+                <tr>
+                    <th>DESCRIPTION</th>
+                    <th>QTY</th>
+                    <th>UNIT PRICE</th>
+                    <th>AMOUNT</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceRows">
+                <tr class="table-row">
+                    <td><input type="text" class="editable-input" value="Web Development Service" onchange="updateTotal()"></td>
+                    <td><input type="number" class="editable-input" value="1" onchange="updateTotal()"></td>
+                    <td><input type="number" class="editable-input" value="25000" onchange="updateTotal()"></td>
+                    <td class="amount-cell">₹25,000.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+                <tr class="table-row">
+                    <td><input type="text" class="editable-input" value="Mobile App Development" onchange="updateTotal()"></td>
+                    <td><input type="number" class="editable-input" value="1" onchange="updateTotal()"></td>
+                    <td><input type="number" class="editable-input" value="40000" onchange="updateTotal()"></td>
+                    <td class="amount-cell">₹40,000.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+                <tr class="table-row">
+                    <td><input type="text" class="editable-input" value="SEO Optimization" onchange="updateTotal()"></td>
+                    <td><input type="number" class="editable-input" value="1" onchange="updateTotal()"></td>
+                    <td><input type="number" class="editable-input" value="15000" onchange="updateTotal()"></td>
+                    <td class="amount-cell">₹15,000.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="add-row-btn" onclick="addRow()">+ Add New Item</button>
+
+        <!-- Totals -->
+        <div class="invoice-totals">
+            <div class="totals-section">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">₹80,000.00</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax (18%):</span>
+                    <span id="tax">₹14,400.00</span>
+                </div>
+                <div class="total-row final">
+                    <span>TOTAL:</span>
+                    <span id="total">₹94,400.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="editable" contenteditable="true">Thank you for your business!</div>
+        </div>
+    </div>
+
+    <script>
+        function updateTotal() {
+            const rows = document.querySelectorAll('#invoiceRows tr');
+            let subtotal = 0;
+
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector('input[type="number"]:nth-of-type(1)').value) || 0;
+                const price = parseFloat(row.querySelector('input[type="number"]:nth-of-type(2)').value) || 0;
+                const amount = qty * price;
+                
+                row.querySelector('.amount-cell').textContent = `₹${amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                subtotal += amount;
+            });
+
+            const tax = subtotal * 0.18;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = `₹${subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('tax').textContent = `₹${tax.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('total').textContent = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        }
+
+        function addRow() {
+            const tbody = document.getElementById('invoiceRows');
+            const newRow = document.createElement('tr');
+            newRow.className = 'table-row';
+            
+            newRow.innerHTML = `
+                <td><input type="text" class="editable-input" value="" onchange="updateTotal()"></td>
+                <td><input type="number" class="editable-input" value="1" onchange="updateTotal()"></td>
+                <td><input type="number" class="editable-input" value="0" onchange="updateTotal()"></td>
+                <td class="amount-cell">₹0.00</td>
+                <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+            `;
+            
+            tbody.appendChild(newRow);
+            newRow.style.animation = 'slideIn 0.5s ease-out';
+            updateTotal();
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => {
+                row.remove();
+                updateTotal();
+            }, 300);
+        }
+
+        // Initialize totals on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTotal();
+        });
+
+        // Auto-save functionality
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('editable-input') || e.target.classList.contains('editable')) {
+                // You can add localStorage save here if needed
+                console.log('Content saved automatically');
+            }
+        });
+    </script>
+</body>
+</html>
